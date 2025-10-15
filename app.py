@@ -116,20 +116,6 @@ def main():
         """
         )
 
-        # Settings
-        st.header("Settings")
-
-        temperature = st.slider(
-            "Response creativity",
-            min_value=0.0,
-            max_value=1.0,
-            value=0.7,
-            step=0.1,
-            help="Higher values make responses more creative",
-        )
-
-        st.markdown("---")
-
         # Sample questions
         st.header("Sample Questions")
         sample_questions = [

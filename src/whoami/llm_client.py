@@ -8,7 +8,7 @@ from typing import List, Dict
 class OpenRouterClient:
     """Client for interacting with OpenRouter API."""
 
-    def __init__(self, model: str = "openai/gpt-oss-20b:free", prompts_file: str = None):
+    def __init__(self, model: str = "meta-llama/llama-3.3-70b-instruct:free", prompts_file: str = None):
         """
         Initialize OpenRouter client.
 
@@ -66,53 +66,6 @@ class OpenRouterClient:
         prompt = prompt_template.format(context=context, query=query)
 
         return prompt
-
-    def generate_response(
-        self, query: str, context_chunks: List[Dict], max_tokens: int = 500, temperature: float = 0.7
-    ) -> Dict:
-        """
-        Generate a response using OpenRouter API.
-
-        Args:
-            query: User's question
-            context_chunks: Retrieved document chunks for context
-            max_tokens: Maximum tokens in response
-            temperature: Sampling temperature (0-1)
-
-        Returns:
-            Dictionary with response and metadata
-        """
-        # Create prompt
-        prompt = self.create_prompt(query, context_chunks)
-
-        # Prepare request payload
-        payload = {
-            "model": self.model,
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": max_tokens,
-            "temperature": temperature,
-        }
-
-        try:
-            response = requests.post(self.api_url, headers=self.headers, json=payload, timeout=30)
-            response.raise_for_status()
-            data = response.json()
-
-            return {
-                "answer": data["choices"][0]["message"]["content"],
-                "model": self.model,
-                "sources": [chunk.get("source") for chunk in context_chunks],
-                "context_chunks": context_chunks,
-            }
-
-        except requests.exceptions.RequestException as e:
-            return {
-                "answer": f"Error generating response: {str(e)}",
-                "model": self.model,
-                "sources": [],
-                "context_chunks": [],
-                "error": str(e),
-            }
 
     def chat(self, query: str, context_chunks: List[Dict], chat_history: List[Dict] = None) -> Dict:
         """

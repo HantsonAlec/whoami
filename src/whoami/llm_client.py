@@ -6,8 +6,6 @@ from typing import List, Dict
 
 
 class OpenRouterClient:
-    """Client for interacting with OpenRouter API."""
-
     def __init__(self, model: str = "meta-llama/llama-3.3-70b-instruct:free", prompts_file: str = None):
         """
         Initialize OpenRouter client.

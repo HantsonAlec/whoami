@@ -2,6 +2,8 @@
 
 A conversational AI web application that answers questions about my skills, experience, and background using RAG (Retrieval-Augmented Generation).
 
+My hosted version can be found here: https://whoami-alec.streamlit.app/
+
 ## 🚀 Features
 
 -   **Intelligent Document Search**: Uses Pinecone vector database for semantic search

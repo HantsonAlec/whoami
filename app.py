@@ -160,6 +160,17 @@ def main():
 
     # ====== TAB 1: CHAT ======
     with tab_chat:
+        # Display chat history first
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+                if message["role"] == "assistant" and "sources" in message:
+                    display_sources(message["sources"], message.get("context_chunks", []))
+
+        # Chat input - Always at the bottom
+        user_input = st.chat_input("Ask me anything about Alec...")
+
+        # Check for pre-selected questions from other tabs or sidebar
         query = None
         if st.session_state.selected_skill:
             query = st.session_state.selected_skill
@@ -170,60 +181,45 @@ def main():
         elif "sample_question" in st.session_state:
             query = st.session_state.sample_question
             del st.session_state.sample_question
-
-        # Display chat history
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-                if message["role"] == "assistant" and "sources" in message:
-                    display_sources(message["sources"], message.get("context_chunks", []))
-
-        user_input = st.chat_input("Ask me anything about Alec...")
-
-        if not query:
+        elif user_input:
             query = user_input
+
+        # Process query if exists
         if query:
-            # Add user message to chat
             st.session_state.messages.append({"role": "user", "content": query})
-            with st.chat_message("user"):
-                st.markdown(query)
 
-            # Generate response
-            with st.chat_message("assistant"):
-                with st.spinner("Searching documents and generating response..."):
-                    try:
-                        # Retrieve relevant chunks
-                        context_chunks = embedding_manager.query(query, top_k=5)
+            try:
+                context_chunks = embedding_manager.query(query, top_k=5)
 
-                        if not context_chunks:
-                            response_text = "I couldn't find relevant information to answer your question. Please try rephrasing or ask something else!"
-                            sources = []
-                        else:
-                            response = llm_client.chat(
-                                query=query, context_chunks=context_chunks, chat_history=st.session_state.chat_history
-                            )
+                if not context_chunks:
+                    response_text = "I couldn't find relevant information to answer your question. Please try rephrasing or ask something else!"
+                    sources = []
+                else:
+                    response = llm_client.chat(
+                        query=query, context_chunks=context_chunks, chat_history=st.session_state.chat_history
+                    )
 
-                            response_text = response["answer"]
-                            sources = response["sources"]
+                    response_text = response["answer"]
+                    sources = response["sources"]
 
-                        st.markdown(response_text)
-                        if context_chunks:
-                            display_sources(sources, context_chunks)
-                        st.session_state.messages.append(
-                            {
-                                "role": "assistant",
-                                "content": response_text,
-                                "sources": sources,
-                                "context_chunks": context_chunks,
-                            }
-                        )
+                st.session_state.messages.append(
+                    {
+                        "role": "assistant",
+                        "content": response_text,
+                        "sources": sources,
+                        "context_chunks": context_chunks,
+                    }
+                )
 
-                        # Update chat history for LLM
-                        st.session_state.chat_history.append({"role": "user", "content": query})
-                        st.session_state.chat_history.append({"role": "assistant", "content": response_text})
+                # Update chat history for LLM
+                st.session_state.chat_history.append({"role": "user", "content": query})
+                st.session_state.chat_history.append({"role": "assistant", "content": response_text})
 
-                    except Exception as e:
-                        st.error(f"Error generating response: {e}")
+            except Exception as e:
+                st.error(f"Error generating response: {e}")
+
+            # Rerun to display the new messages
+            st.rerun()
 
     # ====== TAB 2: SKILLS VISUALIZATION ======
     with tab_skills:

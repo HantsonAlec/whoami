@@ -14,8 +14,10 @@ class OpenRouterClient:
             model: Model identifier (default uses a free model)
             prompts_file: Path to prompts JSON file (default: config/prompts.json)
         """
+        self.is_local = os.getenv("IS_LOCAL", "false").lower() == "true"
+
         self.api_key = os.getenv("OPENROUTER_API_KEY")
-        if not self.api_key:
+        if not self.api_key and not self.is_local:
             raise ValueError("OPENROUTER_API_KEY not found in environment variables")
 
         self.model = model
@@ -77,6 +79,15 @@ class OpenRouterClient:
         Returns:
             Dictionary with response and metadata
         """
+        # Return mocked response if IS_LOCAL is true
+        if self.is_local:
+            return {
+                "answer": f"This is a mocked message for query: {query}",
+                "model": self.model,
+                "sources": [chunk.get("source") for chunk in context_chunks],
+                "context_chunks": context_chunks,
+            }
+
         # Create context from chunks
         context = self.create_prompt(query, context_chunks)
 

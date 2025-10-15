@@ -157,12 +157,12 @@ def main():
             if message["role"] == "assistant" and "sources" in message:
                 display_sources(message["sources"], message.get("context_chunks", []))
 
-    # Handle sample question
+    user_input = st.chat_input("Ask me anything about Alec...")
     if "sample_question" in st.session_state:
         query = st.session_state.sample_question
         del st.session_state.sample_question
     else:
-        query = st.chat_input("Ask me anything about Alec...")
+        query = user_input
 
     # Process query
     if query:

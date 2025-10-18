@@ -16,7 +16,7 @@ class OpenRouterClient:
     DEFAULT_TIMEOUT = 30
     MAX_HISTORY_MESSAGES = 6
 
-    def __init__(self, model: str = None, prompts_file: Path = None):
+    def __init__(self, model: str = None, prompts_file: Optional[Path] = None):
         """
         Initialize OpenRouter client.
 

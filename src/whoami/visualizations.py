@@ -4,6 +4,7 @@ from typing import List, Dict, Any
 
 
 class SkillsVisualization:
+    """Provides skills data and visualization methods."""
     SKILLS_DATA = {
         "Programming Languages": {
             "Python": 5,
@@ -54,8 +55,9 @@ class SkillsVisualization:
 
 
 class TimelineVisualization:
-    """Create interactive career timeline."""
+    """Creates interactive visualizations for career and education timeline."""
 
+    # Timeline data configuration
     TIMELINE_DATA = [
         {
             "type": "work",
